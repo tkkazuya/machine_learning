@@ -1,0 +1,108 @@
+\documentclass[uplatex,12pt,dvipdfmx]{jsarticle}
+\usepackage{amsmath,amssymb}
+\usepackage[dvipdfmx]{graphicx,xcolor}
+\usepackage{float}
+\usepackage{cases}
+\usepackage{tikz}
+\usetikzlibrary{intersections,calc,arrows.meta}
+\usepackage{bm}
+\usepackage{physics}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{ascmac}
+\usepackage{fancybox}
+\usepackage{mathrsfs}
+\usepackage[compat=1.1.0]{tikz-feynhand}
+\usepackage[top=13truemm,bottom=20truemm,right=20truemm,left=20truemm]{geometry}
+\allowdisplaybreaks[4]
+\begin{document}
+
+\setcounter{section}{0}
+\setcounter{subsection}{0}
+
+\section{機械学習}
+
+機械学習についてのまとめを行う。数式の詳細な証明は省略し、設定と結論、Pythonのライブラリについてまとめる。
+
+\subsection{教師あり学習}
+
+\noindent$\blacksquare$ \textbf{線形回帰}
+
+回帰とは、手元にある実測値について\textbf{連続変数を用いたモデルで学習させる}ことを指す。
+線形回帰のモデルは、$n$番目の予測値$y_{n}$に対して
+\begin{align}
+    y_n&=\sum_{m=1}^{M}w_{m}x_{nm}+b \\
+    &=\sum_{m=0}^{M}w_{m}x_{nm}
+\end{align}
+と定義される。ここで、バイアス$b$は$w_0=b,x_0=1$として和の中に含めた。目標値ベクトル$\bm{y}$は行列$X=\{x_{nm}\}$と最適化パラメータベクトル$\bm{w}$を用いて
+\begin{align}
+    \mqty(
+            y_1 \\ y_2 \\ \vdots \\ \\ \vdots \\ y_N
+        )&=\mqty(
+        1 & x_{11} & \cdots & & \cdots & x_{1M} \\
+        1 & x_{21} & \cdots & & \cdots & x_{2M} \\
+        \vdots & \vdots & \ddots & &        & \vdots \\
+                &        &        & &        &        \\
+        \vdots & \vdots &        & & \ddots & \vdots \\
+        1 & x_{N1} & \cdots & & \cdots & x_{NM})\mqty(
+            w_0 \\ w_1 \\ \vdots \\ \\ \\ \\ \vdots \\ w_M
+        ) \\
+    \label{y=wx}\therefore\bm{y}&=X\bm{w}
+\end{align}
+と書ける。$\bm{w}$の$M+1$個全てに対して最適化を行う。
+以下では
+\begin{itemize}
+    \item [\textcircled{a}]重回帰分析
+    \item [\textcircled{b}]Ridge回帰
+    \item [\textcircled{c}]Lasso回帰
+\end{itemize}
+について考える。
+
+\noindent\textcircled{a}~\textbf{重回帰分析}
+
+重回帰分析とは、2つ以上の変数から決定される値に対して回帰分析を行うことを指す。目的関数は\textbf{最小二乗法}による二乗和誤差であり、目標値を$t_n$と置けば
+\begin{align}
+    \mathcal{L}&=\sum_{n=1}^{N}\qty(t_n-y_n)^2 \\
+    &=\qty(\bm{t}-\bm{y})^{\mathrm{t}}\qty(\bm{t}-\bm{y}) \\
+    &=\norm{\bm{t}-\bm{y}}^2_2
+\end{align}
+と書ける。式(\ref{y=wx})を代入して$\bm{w}$について最適化の条件を求めると
+\begin{align}
+    0&=\dv{\mathcal{L}}{\bm{w}}=0-2X^{\mathrm{T}}\bm{t}+\bm{w}^{\mathrm{T}}\qty(X^{\mathrm{T}}X+\qty(X^{\mathrm{T}}X)^{\mathrm{T}}) \\
+    \label{normal}\therefore \bm{w}&=\qty(X^{\mathrm{T}}X)^{-1}X^{\mathrm{T}}\bm{t}
+\end{align}
+となり、式(\ref{normal})を\textbf{正規方程式}という。式(\ref{normal})を計算することで最適化パラメータを求めることができるが、実際にはデータセットが非常に多い場合には$\qty(X^{\mathrm{T}}X)^{-1}$を計算するコストが大きくなるし、そもそも$X^{\mathrm{T}}X$に逆行列が存在することが非自明であるため、\textbf{勾配降下法}を用いて目的関数を最適化することのほうが多い(scikit-learnもこちらで計算しているはず)。
+
+\noindent\textcircled{b}~\textbf{Ridge回帰}
+
+Ridge回帰とは、重回帰モデルに対して\textbf{正則項}と呼ばれる項を導入し、$\bm{w}$の1成分だけが異常に大きい値になり、目的関数がその部分の入力変数の値に非常に敏感になってしまい、学習時に用いなかったデータに対して予測の精度が落ちてしまうこと(\textbf{過学習})を防ぐことができる(ことがある)。
+
+目的関数は次の通り。
+\begin{align}
+    \mathcal{L}&=\sum_{n=1}^{N}\qty(t_n-y_n)^2+\alpha\sum_{n=1}^{M}w_n^2 \\
+    &=\norm{\bm{t}-\bm{y}}^2_2+\alpha\norm{\bm{w}}_2^2 
+\end{align}
+この目的関数の第二項が正則項と呼ばれる量で、係数$\alpha$はモデルの学習を行う前に設定するパラメータで、\textbf{ハイパーパラメータ}と呼ばれる。これによって目的関数に罰則を加えることで$\bm{w}$の値をバランスよくし、過学習を防ぐことができる。ちなみに、正規方程式は
+\begin{align}
+    \bm{w}=\qty(X^{\mathrm{T}}X+\alpha I)^{-1}X^{\mathrm{T}}\bm{t}
+\end{align}
+と書け、正則項による変更が入っていることがわかる。こちらも勾配降下法を用いることが多いらしい。
+
+\noindent\textcircled{c}~\textbf{Lasso回帰}
+
+Lasso回帰とは、Ridge回帰と同様に重回帰モデルに対して正則項を導入して過学習を防ぐモデルである。
+
+目的関数は次の通り。
+\begin{align}
+    \mathcal{L}&=\sum_{n=1}^{N}\qty(t_n-y_n)^2+\alpha\sum_{n=1}^{M}\abs{w_n} \\
+    &=\norm{\bm{t}-\bm{y}}^2_2+\alpha\norm{\bm{w}}_1
+\end{align}
+Ridge回帰との大きな違いは、正則項にL1ノルムが用いられている点である。これによってRidge回帰のように「最も大きいパラメータの値を小さくする」のではなく、「過学習の原因となっている入力変数のパラメータの値を0にしてしまう」という方法によって過学習を防ぐのである。正規方程式は難しいので割愛\dots(\url{https://qiita.com/torahirod/items/a79e255171709c777c3a})
+
+\subsection{教師なし学習}
+
+\subsection{強化学習}
+
+
+
+\end{document}
