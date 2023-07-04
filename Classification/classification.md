@@ -17,13 +17,13 @@
 
 **線形分類器の例**
 - 単純パーセプトロン
-- 線形SVM
+- **線形SVM**
 - ロジスティック回帰
 
 **非線形分類器の例**
 - k-近傍法
 - **決定木（分類木）**
-- ランダムフォレスト
+- **ランダムフォレスト**
 - 非線形SVM
 - NN（ニューラルネットワーク）
 
@@ -111,7 +111,7 @@ $$
 \Delta I(t_P) = \frac{n_P}{N}I(t_P) - \frac{n_L}{N}I(t_L) - \frac{n_R}{N}I(t_R)
 $$
 
-求める特徴量重要度を$M(t_P)とすると、以下の式のようになる。
+求める特徴量重要度を$M(t_P)$とすると、以下の式のようになる。
 $$
 M(t_p) = \frac{\Delta I(t_P)}{\Sigma_P^{all nodes} \Delta I(t_P)}
 $$
@@ -122,7 +122,7 @@ $$
 参考：
 - <https://yolo-kiyoshi.com/2019/09/16/post-1226/>
 - <http://taustation.com/decision-tree-feature-importance-calculation/>
--<https://qiita.com/H1dek1/items/72976f956d34d275d862>
+- <https://qiita.com/H1dek1/items/72976f956d34d275d862>
 
 --- 
 ## 3.代表的な分類のアルゴリズム
@@ -158,7 +158,8 @@ ex:2次元のデータを2次元へ写像し、平面で線形分類
 - FN (False Negative、偽陰性)：予測値を負例として、その予測が誤りの場合の数
 
 評価指標の種類
-1.Accuracy（正解率）
+
+1. Accuracy（正解率）
 - 全ての判定のうち、予測が正しい割合
 - 分類の精度指標として最も一般的
 
@@ -185,4 +186,14 @@ $$
 - トレードオフの関係のPrecision・Recallのバランスをとるための指標
 - Precision・Recallの調和平均の形で表される。
 
+5. クロスエントロピー
 
+<https://www.anarchive-beta.com/entry/2020/06/17/180000>
+
+次回までにやること
+- クロスエントロピーの実際の計算方法
+- 分類手法別の目的と仕組み
+- 一部実装
+
+kaggle
+- <https://www.kaggle.com/competitions/icr-identify-age-related-conditions/data>
