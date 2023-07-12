@@ -193,7 +193,11 @@ $$
 次回までにやること
 - クロスエントロピーの実際の計算方法
 - 分類手法別の目的と仕組み
-- 一部実装
+- 各手法の実装と理解
 
 kaggle
 - <https://www.kaggle.com/competitions/icr-identify-age-related-conditions/data>
+
+Kaggle tips
+- <https://www.kaggle.com/discussions/getting-started/44997>
+- 
