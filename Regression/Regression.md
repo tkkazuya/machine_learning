@@ -127,37 +127,37 @@ $$
 
 正規方程式は解析的には求められないっぽい。座標降下法と呼ばれる方法で実装されている。
 
+参照：
+
+- <http://taustation.com/lasso-regression-understanding/>
+- <https://qiita.com/torahirod/items/a79e255171709c777c3a> 
+
 ### Ridge回帰 vs Lasso回帰
 
 <table>
     <tr>
         <th></th>
-        <th>正則化の手法</th>
         <th>メリット</th>
         <th>デメリット</th>
     </tr>
     <tr>
         <th>Ridge回帰</th>
-        <td>L2</td>
         <td>・少ないデータ数でも機能する<br>・共線性があっても有用な変数が<br>削除されない</td>
         <td>・特徴量を絞ることができない</td>
     </tr>
     <tr>
         <th>Lasso回帰</th>
-        <td>L1</td>
         <td>・解釈性、過学習防止性が高い</td>
-        <td>・p>nでは使えない<br>・共線性があるとき、特徴量を消してしまう<br>事がある</td>
+        <td>・M>Nでは使えない<br>・共線性があるとき、特徴量を消してしまう<br>事がある</td>
     </tr>
 </table>
 
 ## 3. 回帰分析の評価指標
 
-以下では回帰分析に用いられる評価指標として
+以下では回帰分析に用いられる評価方法として
 
 - 決定係数 $R^2$
-- 平均二乗誤差（MSE）
-- 平均平方二乗誤差（RMSE）
-- 平均絶対誤差（MAE）
+- k-Fold Cross Varidation
 
 を紹介する。
 
@@ -167,24 +167,79 @@ $$
 
 $$
 \begin{align}
-    R^2=1-\frac{\sum_{n=1}^{N}\left(t_n-y_n\right)^2}{\sum_{n=1}^{N}\left(t_n-\bar{t}\right)^2} \notag
+    R^2=1-\frac{\sum_{k=1}^{n}\left(t_k-y_k\right)^2}{\sum_{k=1}^{n}\left(t_k-\bar{t}\right)^2} \notag
 \end{align}
 $$
 
-$t_n$ は目標値、$\bar{t}$ は目標値の平均である。つまり、この決定係数は最小化した目的関数が目標値の分散に対してどれだけ離れているかを表している。したがって、そのデータにとって良いモデルほど決定係数は1に近づき、そのモデルがどれだけ優れているかを数値で確認することができる。
+$t_n$ は目標値、$\bar{t}$ は目標値の平均である。つまり、この決定係数は最小化した目的関数が目標値の分散に対してどれだけ離れているかを表している。したがって、そのモデルがデータセットに対してどれだけ当てはまりが良いかを見ることができる。
 
-### 平均二乗誤差（MSE）
+以前は計算機の性能の問題により、以下で述べるk-Fold Cross Varidationのような評価法を用いることができなかった。そのため、hold-out法でモデルを学習させ、その結果を決定係数で評価することが多かった。しかし、これは特徴量の数を増やすと値が良くなるという性質を持っており、モデルの評価を正しく行うことができないため、現代で使われることはない。また、それをある程度改善したものとして自由度調整済みの決定係数というものが存在するが、特徴量が増えるときに与える罰則の大きさが足りておらず、この問題を真に解決することはできない。
+
+参照：
+
+- <https://qiita.com/s-yonekura/items/43aefbe726ee814123f7#%E8%87%AA%E7%94%B1%E5%BA%A6%E8%AA%BF%E6%95%B4%E6%B8%88%E3%81%BF%E3%81%AE%E6%B1%BA%E5%AE%9A%E4%BF%82%E6%95%B0>
+- <https://bellcurve.jp/statistics/course/9706.html>
+- <https://marketing.xica.net/column/about-coefficient-of-determination/#:~:text=%E6%B1%BA%E5%AE%9A%E4%BF%82%E6%95%B0%E3%81%A8%E3%81%AF%E3%80%81%E5%9B%9E%E5%B8%B0,%E9%87%8D%E5%9B%9E%E5%B8%B0%E5%88%86%E6%9E%90%E3%81%8C%E3%81%82%E3%82%8A%E3%81%BE%E3%81%99%E3%80%82>
+
+### k-Fold Cross Varidation
+
+k-Fold Cross Varidationとは、以下のような手順で行うモデルの汎化性能を測る手段である。
+
+1. 教師データを $a_1\sim a_k$ に $k$ 分割し、ある $a_i~(i=1,2,\cdots,k)$ をテストデータに、それ以外を学習データとしてモデルの学習を行い、精度 $r_i$ を算出する。
+2. 1の操作を $i=1,2,\cdots,k$ で $k$ 回行い、出てきた $k$ 個の精度を平均したもの $\bar{r}$ を算出し、これをこのモデルの精度とする。
+
+以下に $k=5$ の場合を図で示す。
+
+![5-FoldCV](./5-FoldCV.png)
+<https://datawokagaku.com/kfoldcv/#k-Fold_Cross_Validation>
+
+この方法を用いることで、hold-out法で引き起こされるテストデータと学習データの分割にランダム性を減らすことができ( $k=N$ で完全に排除できる)、過学習を避けることにつながるため、モデルの精度評価をより正確に行うことができる。
+
+ここで、精度として用いられるものは
+
+- 平均平方二乗誤差（RMSE）
+- 平均絶対誤差（MAE）
+
+の二つがある。
+
+#### 平均平方二乗誤差（RMSE）
 
 これは以下のような式で与えられる。
 
-### 平均平方二乗誤差（RMSE）
+$$
+\begin{align}
+    RMSE=\sqrt{\frac{1}{n}\sum_{k=1}^{n}\left(t_k-y_k\right)^2}
+\end{align}
+$$
 
-### 平均絶対誤差（MAE）
+予測値と目標値が近づくほどRMSEの値は小さくなる。誤差を二乗して足しているため、外れ値があると値が大きくなってしまう。したがって、RSMEは外れ値の影響を受けやすい。これは元のデータと同じ次元を持っているため、得られる結果は「見積もられる誤差の大きさ」として意味を持つ。
 
-参照:
+#### 平均絶対誤差（MAE）
 
-- <http://taustation.com/lasso-regression-understanding/>
-- <https://qiita.com/torahirod/items/a79e255171709c777c3a> 
+これは以下のような式で表される。
+
+$$
+\begin{align}
+    MAE=\frac{1}{n}\sum_{k=1}^{n}\left|t_k-y_k\right|
+\end{align}
+$$
+
+これはRMSEと違い、誤差を二乗していないため外れ値に強い。得られる結果はRMSEと同様に「見積もられる誤差の大きさ」を表す。
+
+最後に、この検証結果を元にしたモデルの最終選択について述べる。これは二つの主張がある。
+
+- すべての学習データを用いて学習し直したモデルを最終結果とする
+- k-Fold Cross Varidationで作った各モデルのパラメータを平均する
+
+どちらがいいのかという部分は定量的な評価がなされているものを見つけることができなかったためよくわからないが、前者を指示している記事のほうが多かった（体感）気がする。
+
+参照：
+
+- <https://best-biostatistics.com/correlation_regression/crossvalidation.html#i-9>
+- <https://aizine.ai/glossary-crossvalidation/>
+- <https://qiita.com/oki_kosuke/items/3934cd311fc805cafe81>
+- <https://www.simpletraveler.jp/2022/03/30/machinelearning-crossvalidation-model-selection/>
+- <https://an-engineer-note.com/?p=17#toc5>
 
 ---
 
