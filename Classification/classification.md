@@ -11,7 +11,7 @@
 **分類**：カテゴリ（離散値）を予測すること
 
 分類とは、（二次元の場合は）「カテゴリが異なる複数のデータを見分けることができる境界線を求めること」
-- 一本の直線で分けられることを**線形分離可能**、そのアルゴリズムは**線形分類器**と呼ばれる。
+- 一本の直線、平面、超平面で分けられることを**線形分離可能**、そのアルゴリズムは**線形分類器**と呼ばれる。
 - 直線を複数組み合わせて分類するとき、そのアルゴリズムを**非線形分類器**と呼ぶ。
 
 
@@ -31,6 +31,9 @@
 ## 2.決定木の理論
 - 条件分岐を繰り返すことによって、分類を行う。
 - 決定木では、各ノードでデータの「不純度」が低くなるように2つのグループに分割する。
+- CART, CHAID, C5.0などがある。分岐、目的指標、分岐の指標が違う
+    - CARTではジニ不純度,s CHAIDではカイ二乗統計量, C5.0では平均エントロピー（平均情報量）が使用される。
+参考：<http://www.analyticsdlab.co.jp/column/decisiontree.html>
 
 **Irisデータセットの例**
 ![](./decision_tree.png)
@@ -41,6 +44,7 @@
 - cf:ジニ係数（富の分配率を表す指数）
 - 分岐されたノードの不純度を表す
 - scikit-learnでは、CARTというアルゴリズムを使用。
+
 
 **ジニ不純度の定式化**
 
@@ -126,6 +130,32 @@ $$
 
 --- 
 ## 3.代表的な分類のアルゴリズム
+### 分類アルゴリズム一覧
+#### 教師あり
+- ロジスティック回帰 (Logistic Regression)
+- k最近傍法 (k-Nearest Neighbors, k-NN)
+- サポートベクターマシン (Support Vector Machines, SVM)
+- 決定木 (Decision Trees)
+- ランダムフォレスト (Random Forests)
+- 勾配ブースティング決定木 (Gradient Boosting Trees)
+- ニューラルネットワーク (Neural Networks)
+- ナイーブベイズ (Naive Bayes)
+- アンサンブル学習法 (Ensemble Methods)
+- AdaBoost
+#### **教師なし**（本当？）
+- k平均法 (k-Means Clustering)
+- 階層クラスタリング (Hierarchical Clustering)
+- 主成分分析 (Principal Component Analysis, PCA)
+- 独立成分分析 (Independent Component Analysis, ICA)
+- 多次元尺度構成法 (Multidimensional Scaling, MDS)
+- 非負値行列因子分解 (Non-negative Matrix Factorization, NMF)
+- アソシエーションルール学習 (Association Rule Learning)
+- 自己組織化マップ (Self-Organizing Maps, SOM)
+- 異常検知 (Anomaly Detection)
+- クラスタリングの密度推定 (Density Estimation for Clustering)
+
+
+
 
 ### SVM
 - 教師ありの分類器の一つ
@@ -190,14 +220,18 @@ $$
 
 <https://www.anarchive-beta.com/entry/2020/06/17/180000>
 
+---
+
 次回までにやること
 - クロスエントロピーの実際の計算方法
 - 分類手法別の目的と仕組み
-- 各手法の実装と理解
+- 一部実装
+- 誤差逆伝播について
 
 kaggle
 - <https://www.kaggle.com/competitions/icr-identify-age-related-conditions/data>
+- <https://scikit-learn.org/stable/modules/feature_selection.html#univariate-feature-selection>
+- <https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.SelectKBest.html>
 
-Kaggle tips
-- <https://www.kaggle.com/discussions/getting-started/44997>
-- 
+機械学習手法一覧
+- <https://qiita.com/tomomoto/items/b3fd1ec7f9b68ab6dfe2>
