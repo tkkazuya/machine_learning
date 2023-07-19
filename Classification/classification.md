@@ -36,7 +36,7 @@
 参考：<http://www.analyticsdlab.co.jp/column/decisiontree.html>
 
 **Irisデータセットの例**
-![](./decision_tree.png)
+![](./tree_graph.png)
 <https://free.kikagaku.ai/tutorial/basic_of_machine_learning/learn/machine_learning_classification>
 
 
@@ -129,31 +129,44 @@ $$
 - <https://qiita.com/H1dek1/items/72976f956d34d275d862>
 
 --- 
-## 3.代表的な分類のアルゴリズム
+## 3.その他のアルゴリズム
 ### 分類アルゴリズム一覧
 #### 教師あり
-- ロジスティック回帰 (Logistic Regression)
+- SVM（後述）
+- 決定木（上述）
+- ロジスティック回帰（後述）
 - k最近傍法 (k-Nearest Neighbors, k-NN)
-- サポートベクターマシン (Support Vector Machines, SVM)
-- 決定木 (Decision Trees)
+    - 未知と既知のデータ同士の距離を計算し、未知のデータが属するクラスを推定。
+    - 近傍のデータによってクラスが決まる場合に使用。k-近傍への。計算が簡単。特徴量の数が少ない場合。
 - ランダムフォレスト (Random Forests)
+    - 複数の決定木モデルを組み合わせる。
+    - 大規模・高次元なデータセットに使用。予測性能が高い。
 - 勾配ブースティング決定木 (Gradient Boosting Trees)
+    - 弱学習器を順にトレーニングし、前のモデルの予測誤差に対して重点的に学習させ性能を向上させる。
+    - 予測性能が高い。予測性能を最大化するときに使用。
 - ニューラルネットワーク (Neural Networks)
-- ナイーブベイズ (Naive Bayes)
-- アンサンブル学習法 (Ensemble Methods)
-- AdaBoost
-#### **教師なし**（本当？）
-- k平均法 (k-Means Clustering)
-- 階層クラスタリング (Hierarchical Clustering)
-- 主成分分析 (Principal Component Analysis, PCA)
-- 独立成分分析 (Independent Component Analysis, ICA)
-- 多次元尺度構成法 (Multidimensional Scaling, MDS)
-- 非負値行列因子分解 (Non-negative Matrix Factorization, NMF)
-- アソシエーションルール学習 (Association Rule Learning)
-- 自己組織化マップ (Self-Organizing Maps, SOM)
-- 異常検知 (Anomaly Detection)
-- クラスタリングの密度推定 (Density Estimation for Clustering)
+    -　非線形な関係性のモデリング、大量のデータによる学習効果、特徴抽出・時限削減に強い。多様なデータタイプに使用可能。
 
+- ナイーブベイズ (Naive Bayes)
+    - ベイズの定理を使用し、特徴量の条件付き確率を推定する.
+    - 簡単・高速な実装。計算上の効率性。質的変数の扱いにも適する。
+
+- アンサンブル学習法 (Ensemble Methods)
+     - 複数の学習モデルを組み合わせて最終的な予測を行い、単一のモデルよりも高い予測性能を目指す。
+
+
+#### **教師なし**
+- 階層クラスタリング (Hierarchical Clustering)
+    - 最初各点を個別のクラスタとして扱い類似度によって他のクラスタと徐々にマージし、ツリー構造で出力する。
+    - 凝集型では徐々にマージしていき、分解型では徐々にスプリットする。
+    - 階層構造により、クラスタ間の類似性や包含関係が明確になる。
+    - ex:ウォード法（ward method）：各データの平方和を使用。
+
+- 非階層クラスタリング（Non-Hierarchical Clustering）
+    -　データを指定した数のクラスタに分割する。
+    - ex:k-means：1.クラスタの中心をランダムに選択, 2.最も近いものにデータを割り当てる, 3.クラスタの中心を再計算。
+
+詳しい手法の説明は[割愛](https://qiita.com/tomomoto/items/b3fd1ec7f9b68ab6dfe2)…
 
 
 
@@ -172,8 +185,16 @@ ex:2次元のデータを2次元へ写像し、平面で線形分類
 
 
 ### ロジスティック回帰（線形分類器の例）
+回帰を分類に適用したい。→結果を０〜１（確率）の形にする。
+シグモイド関数を使用
 
+$$
+z = \frac{1}{1 + \exp({-x})}
+$$
 
+$$
+p(x) = \frac{1}{1+\exp(-(\theta_0 +\theta_{1}x))}
+$$
 
 ---
 ## 4.評価指標
@@ -187,9 +208,8 @@ ex:2次元のデータを2次元へ写像し、平面で線形分類
 
 - FN (False Negative、偽陰性)：予測値を負例として、その予測が誤りの場合の数
 
-評価指標の種類
 
-1. Accuracy（正解率）
+### Accuracy（正解率）
 - 全ての判定のうち、予測が正しい割合
 - 分類の精度指標として最も一般的
 
@@ -197,36 +217,47 @@ $$
 Accuracy = \frac{TP+TN}{TP+FP+TN+FN} 
 $$
 
-2. Precision（適合率）
+### Precision（適合率）
 
 - 予測したもののうち、その予測が正しい割合
 - 誤診を少なくしたいときに使用
 $$
 Precision = \frac{TP}{TP+FP}
 $$
-
-3. Recall（再現率）
+### Recall（再現率）
 
 - 正例のうち、正しく予測がされた割合
 - 正例の見逃しを避けたいときに使用
 $$
 Recall = \frac{TP}{TP+FN}
 $$
-4. F1Score（F値）
+### F1Score（F値）
 - トレードオフの関係のPrecision・Recallのバランスをとるための指標
 - Precision・Recallの調和平均の形で表される。
 
-5. クロスエントロピー
+### クロスエントロピー
 
+
+
+- 誤差関数の一つ、値が小さいほどよい。
+- 尤度関数の対数をとって、負の値にしたもの。
+- ロジスティック回帰等で使われる。
 <https://www.anarchive-beta.com/entry/2020/06/17/180000>
+<https://www.kaggle.com/code/dansbecker/what-is-log-loss>
 
+$$
+H(p,q) = - \Sigma_x p(x)\log(q(x))
+$$
+$p$は真の確率分布、$q$は推定した確率分布。自然対数を使用。
+- 確率的購買降下法（損失関数の最適化手法の一つ）との相性が良い
+    - 自然対数の微分、$e^x$の微分計算が楽
 ---
 
 次回までにやること
 - クロスエントロピーの実際の計算方法
+- 具体的な計算式
 - 分類手法別の目的と仕組み
-- 一部実装
-- 誤差逆伝播について
+
 
 kaggle
 - <https://www.kaggle.com/competitions/icr-identify-age-related-conditions/data>
